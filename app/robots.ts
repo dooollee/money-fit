@@ -1,13 +1,12 @@
 import { MetadataRoute } from "next";
+import { SITE_CONFIG } from "./siteConfig";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://money-fit.vercel.app"; // ★ 본인 도메인으로 변경
-
   return {
     rules: {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_CONFIG.url}/sitemap.xml`,
   };
 }

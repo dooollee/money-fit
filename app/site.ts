@@ -1,11 +1,10 @@
 import { MetadataRoute } from "next";
+import { SITE_CONFIG } from "./siteConfig";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://money-fit.vercel.app"; // ★ 본인 도메인으로 변경
-
   return [
     {
-      url: baseUrl,
+      url: SITE_CONFIG.url,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1.0,
