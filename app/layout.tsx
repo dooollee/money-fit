@@ -28,7 +28,13 @@ export const metadata: Metadata = {
     description: SITE_CONFIG.description,
     siteName: "MoneyFit",
   },
-  // verification은 추후 구글/네이버 키 발급 시 여기에 추가
+  // 구글 및 네이버 검색엔진 소유권 인증 태그
+  verification: {
+    google: "mfNqZmNY8DJsbdfaddyBOxD-E9j4febrtPunM85t5A0",
+    other: {
+      "naver-site-verification": "113dcc85051f0d8054f9f97e0903451903fad084",
+    },
+  },
 };
 
 export default function RootLayout({
