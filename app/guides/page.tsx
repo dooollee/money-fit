@@ -1,73 +1,118 @@
 // app/guides/page.tsx
-import type { Metadata } from "next";
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
+import { YOUTH_POLICIES, PolicyCategory } from "@/data/policies";
 
-export const metadata: Metadata = {
-  title: "2026 핵심 청년 지원금 완전정복 가이드 & FAQ",
-  description: "K-패스, 청년월세지원, 청년도약계좌 2026년 최신 신청 자격과 핵심 혜택을 한눈에 정리했습니다.",
-};
-
-const GUIDES = [
-  {
-    title: "1. K-패스 (청년 대중교통비 환급)",
-    desc: "월 15회 이상 대중교통 이용 시 지출 금액의 최대 30%를 현금 또는 마일리지로 환급해 주는 제도입니다.",
-    target: "만 19세 ~ 34세 청년 (지자체 조례에 따라 최대 만 39세)",
-    benefit: "청년 30% 환급 (월 62,500원 이용 시 월 약 18,750원 절감)",
-    tip: "알뜰교통카드 후속 사업으로, 이동거리 측정 없이 카드 결의만으로 자동 정산되어 훨씬 간편합니다.",
-  },
-  {
-    title: "2. 청년월세 한시 특별지원",
-    desc: "부모와 별도로 거주하는 무주택 청년의 주거비 부담을 덜어주기 위해 실제 납부하는 월세를 지원합니다.",
-    target: "만 19세 ~ 34세 무주택 청년 (중위소득 60% 이하 & 원가구 100% 이하)",
-    benefit: "월 최대 20만 원씩 최대 12개월(또는 24개월) 연속 지원",
-    tip: "보증금 5천만 원 이하 및 월세 70만 원 이하 주택 기준이며, 청약통장 가입이 필수 조건입니다.",
-  },
-  {
-    title: "3. 청년도약계좌",
-    desc: "청년의 중장기 자산 형성을 지원하기 위한 5년 만기 정부 매칭 저축 계좌입니다.",
-    target: "만 19세 ~ 34세 중 개인소득 7,500만 원 이하 & 가구 중위 250% 이하",
-    benefit: "매월 최대 70만 원 납입 시 정부 기여금 + 비과세 혜택으로 최대 약 5,000만 원 목돈 마련",
-    tip: "육아휴직자나 일정 군 복무 기간이 있는 청년의 경우 복무 기간만큼 연령 계산에서 차감 적용됩니다.",
-  },
+const CATEGORIES: ("전체" | PolicyCategory)[] = [
+  "전체",
+  "주거",
+  "금융/자산",
+  "취업/구직",
+  "생활/교통/문화",
 ];
 
 export default function GuidesPage() {
+  const [selectedCategory, setSelectedCategory] = useState<"전체" | PolicyCategory>("전체");
+
+  const filtered =
+    selectedCategory === "전체"
+      ? YOUTH_POLICIES
+      : YOUTH_POLICIES.filter((p) => p.category === selectedCategory);
+
   return (
     <main className="max-w-4xl mx-auto px-4 py-12 text-slate-800">
       <div className="mb-8">
-        <Link href="/" className="text-sm text-blue-600 hover:underline">
+        <Link href="/" className="text-sm font-medium text-blue-600 hover:underline">
           ← MoneyFit 홈으로 돌아가기
         </Link>
-        <h1 className="text-3xl font-bold mt-3 text-slate-900">2026 청년 정책 지원 가이드</h1>
-        <p className="text-slate-600 mt-2">
-          신청 전 필수 체크포인트와 정책별 세부 혜택을 정리해 드립니다.
+        <h1 className="text-3xl font-bold mt-3 text-slate-900 tracking-tight">
+          2026 대한민국 청년 지원금 완전정복 가이드
+        </h1>
+        <p className="text-slate-600 mt-2 text-sm sm:text-base">
+          중앙정부 및 주요 공공기관에서 운영 중인 핵심 청년 지원 정책 12선을 카테고리별로 확인하세요.
         </p>
       </div>
 
-      <div className="space-y-8">
-        {GUIDES.map((item, idx) => (
-          <article key={idx} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <h2 className="text-xl font-bold text-slate-900 mb-3">{item.title}</h2>
-            <p className="text-slate-700 mb-4">{item.desc}</p>
-            <div className="space-y-2 text-sm bg-slate-50 p-4 rounded-xl">
-              <div><strong className="text-slate-900">지원 대상:</strong> {item.target}</div>
-              <div><strong className="text-blue-600">지원 혜택:</strong> {item.benefit}</div>
-              <div><strong className="text-emerald-700">신청 팁:</strong> {item.tip}</div>
+      {/* 카테고리 필터 탭 */}
+      <div className="flex flex-wrap gap-2 mb-8 border-b border-slate-200 pb-4">
+        {CATEGORIES.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+              selectedCategory === cat
+                ? "bg-blue-600 text-white shadow-sm"
+                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+            }`}
+          >
+            {cat} {cat === "전체" ? `(${YOUTH_POLICIES.length})` : `(${YOUTH_POLICIES.filter(p => p.category === cat).length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* 정책 카드 그리드 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {filtered.map((item) => (
+          <article
+            key={item.id}
+            className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col justify-between hover:border-blue-300 transition"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-2">
+                <span className="text-xs font-semibold px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md">
+                  {item.category}
+                </span>
+                <span className="text-xs text-slate-500 font-medium">
+                  만 {item.ageRange.min}세 ~ {item.ageRange.max}세
+                </span>
+              </div>
+              <h2 className="text-lg font-bold text-slate-900 mb-1">{item.title}</h2>
+              <p className="text-sm text-slate-600 mb-4">{item.summary}</p>
+
+              <div className="space-y-1.5 text-xs bg-slate-50 p-3.5 rounded-xl border border-slate-100">
+                <div>
+                  <span className="font-semibold text-blue-700">혜택: </span>
+                  <span className="text-slate-800 font-medium">{item.benefit}</span>
+                </div>
+                <div>
+                  <span className="font-semibold text-slate-600">소득 조건: </span>
+                  <span className="text-slate-700">{item.incomeCondition}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xs text-slate-400">공식 기관 안내</span>
+              <a
+                href={item.officialUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              >
+                신청 바로가기 ↗
+              </a>
             </div>
           </article>
         ))}
       </div>
 
-      <section className="mt-12 p-6 bg-slate-100 rounded-2xl">
-        <h3 className="text-lg font-bold text-slate-900 mb-2">자주 묻는 질문 (FAQ)</h3>
-        <div className="space-y-3 text-sm text-slate-700">
+      {/* 하단 공통 FAQ */}
+      <section className="mt-14 p-6 bg-slate-50 border border-slate-200 rounded-2xl">
+        <h3 className="text-lg font-bold text-slate-900 mb-3">자주 묻는 질문 (FAQ)</h3>
+        <div className="space-y-4 text-sm text-slate-700 leading-relaxed">
           <div>
-            <strong>Q. 다른 지원금과 중복 수령이 가능한가요?</strong>
-            <p className="mt-0.5 text-slate-600">교통비(K-패스)와 자산형성(도약계좌)은 성격이 달라 대다수 중복 가능하나, 생계급여 등 특정 복지급여와 월세 지원은 중복 제한이 있을 수 있으니 상세 지침을 확인해야 합니다.</p>
+            <p className="font-semibold text-slate-900">Q. 여러 지원금을 동시에 중복으로 신청할 수 있나요?</p>
+            <p className="mt-0.5 text-slate-600 text-xs sm:text-sm">
+              교통 지원(K-패스)과 청약(주택드림통장), 자산형성(청년도약계좌)은 대부분 상호 중복이 가능합니다. 단, 생계비 성격의 현금 수당(국민취업지원제도 1유형 vs 지자체 청년수당) 간에는 동시 참여가 제한될 수 있습니다.
+            </p>
           </div>
           <div>
-            <strong>Q. 소득 기준은 세전인가요 세후인가요?</strong>
-            <p className="mt-0.5 text-slate-600">정부 지원금 심사의 기준 중위소득 및 소득 요건은 원칙적으로 건강보험료 산출 기준의 <strong>세전 소득</strong>을 바탕으로 판정합니다.</p>
+            <p className="font-semibold text-slate-900">Q. 군 복무 기간은 나이 산정에 반영되나요?</p>
+            <p className="mt-0.5 text-slate-600 text-xs sm:text-sm">
+              청년도약계좌, 청년주택드림 등 주요 국가 사업은 병역을 이행한 기간(최대 6년)만큼 현재 연령에서 차감 계산해 주므로, 만 35~39세여도 군필자는 수혜 대상이 될 수 있습니다.
+            </p>
           </div>
         </div>
       </section>
