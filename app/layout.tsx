@@ -1,6 +1,5 @@
 // app/layout.tsx
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { SITE_CONFIG } from "./siteConfig";
 import Footer from "@/components/Footer";
@@ -47,12 +46,11 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
-        {/* Google AdSense */}
-        <Script
+        {/* AdSense 정적 스크립트 */}
+        <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1029546769204659"
           crossOrigin="anonymous"
-          strategy="afterInteractive"
         />
       </head>
       <body className="antialiased flex flex-col min-h-screen">
