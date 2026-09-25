@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { YOUTH_POLICIES, Policy } from "@/data/policies";
+import { YOUTH_POLICIES, POLICY_DATA_UPDATED_AT, Policy, findEligiblePolicies } from "@/data/policies";
 
 export default function HomePage() {
   // 사용자 입력 상태
@@ -15,26 +15,7 @@ export default function HomePage() {
   const [matchedPolicies, setMatchedPolicies] = useState<Policy[] | null>(null);
 
   const handleCalculate = () => {
-    const results = YOUTH_POLICIES.filter((policy) => {
-      // 1. 연령 필터
-      if (age < policy.ageRange.min || age > policy.ageRange.max) {
-        return false;
-      }
-
-      // 2. 취업 상태 필터
-      if (policy.statusCondition !== "all" && policy.statusCondition !== employmentStatus) {
-        return false;
-      }
-
-      // 3. 정책별 특정 조건 필터
-      if (policy.id === "youth-rent" && !isIndependent) return false;
-      if (policy.id === "youth-tomorrow-savings" && incomeLevel === "high") return false;
-      if (policy.id === "kua-type-1" && incomeLevel === "high") return false;
-
-      return true;
-    });
-
-    setMatchedPolicies(results);
+    setMatchedPolicies(findEligiblePolicies({ age, employmentStatus, isIndependent, incomeLevel }));
   };
 
   return (
@@ -42,7 +23,7 @@ export default function HomePage() {
       {/* 헤더 섹션 */}
       <section className="text-center mb-10">
         <span className="text-xs font-semibold px-3 py-1 bg-blue-50 text-blue-600 rounded-full border border-blue-100">
-          2026 청년 지원 정책 최신 반영
+          {POLICY_DATA_UPDATED_AT} 기준 청년 정책 반영
         </span>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">
           내가 받을 수 있는 청년 지원금은?
@@ -194,6 +175,11 @@ export default function HomePage() {
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
               각 정책 카드의 상세 내용과 공식 신청 링크를 확인해 보세요.
             </p>
+            {age > 34 && (
+              <p className="text-xs text-slate-500 mt-3">
+                💡 군필자는 청년미래적금 등 일부 정책에서 병역 기간(최대 6년)만큼 나이를 차감받을 수 있습니다.
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -216,6 +202,21 @@ export default function HomePage() {
                   <div className="mt-3 p-2.5 bg-slate-50 rounded-xl text-xs text-blue-700 font-semibold">
                     혜택: {item.benefit}
                   </div>
+                  <dl className="mt-2 space-y-1 text-[11px] text-slate-600">
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">신청 시기: </dt>
+                      <dd className="inline">{item.applyPeriod}</dd>
+                    </div>
+                    <div>
+                      <dt className="inline font-semibold text-slate-700">신청 방법: </dt>
+                      <dd className="inline">{item.howToApply}</dd>
+                    </div>
+                  </dl>
+                  {item.notice && (
+                    <p className="mt-2 text-[11px] text-amber-700 bg-amber-50 rounded-lg px-2.5 py-1.5">
+                      ⚠ {item.notice}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
@@ -238,7 +239,7 @@ export default function HomePage() {
               href="/guides"
               className="inline-flex items-center text-sm font-medium text-slate-600 hover:text-slate-900 underline underline-offset-4"
             >
-              전체 12개 청년 정책 한눈에 비교하러 가기 ➔
+              전체 {YOUTH_POLICIES.length}개 청년 정책 한눈에 비교하러 가기 ➔
             </Link>
           </div>
         </section>
